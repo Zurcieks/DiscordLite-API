@@ -10,9 +10,9 @@ namespace DiscordLite.Application.Friendships.AddFriend
         IUserRepository userRepository,
         ICurrentUser currentUser,
         IUnitOfWork unitOfWork)
-        : IRequestHandler<AddFriendCommand, string>
+        : IRequestHandler<AddFriendCommand, AddFriendResponse>
     {
-        public async Task<string> Handle(
+        public async Task<AddFriendResponse> Handle(
             AddFriendCommand request,
             CancellationToken ct)
         {
@@ -45,7 +45,7 @@ namespace DiscordLite.Application.Friendships.AddFriend
                 sender == exists.ReceiverId)
             {
                 throw new ConflictException(
-                    "FRIENDSHIP_INCOMING_REQUEST_EXISTS",
+                    "FRIENDSHIP_PENDING_REQUEST_EXISTS",
                     "You have a pending friend request from this user.");
             }
 
@@ -63,7 +63,7 @@ namespace DiscordLite.Application.Friendships.AddFriend
             await friendshipRepository.AddAsync(friendship, ct);
             await unitOfWork.SaveChangesAsync(ct);
 
-            return "Friend request sent successfully.";
+            return new AddFriendResponse("Friend request sent successfully.");
         }
     }
 }
