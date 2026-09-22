@@ -11,24 +11,30 @@ using System.Text;
 
 namespace DiscordLite.Infrastructure.Persistence.Repositories
 {
-    public sealed class FriendshipRepository(AppDbContext context) : RepositoryBase<Friendship>(context), IFriendshipRepository
+    public sealed class FriendshipRepository(AppDbContext context, IAvatarStorage avatarStorage) : RepositoryBase<Friendship>(context), IFriendshipRepository
     {
         public async Task<List<FriendshipDto>> GetAllFriends(Guid userId, CancellationToken ct)
         {
-            return await Context.Friendships
+            var rows = await Context.Friendships
                 .Where(x => x.Status == FriendshipStatus.Accepted && 
                 (x.SenderId == userId || x.ReceiverId == userId)) // jedna z stron relacji
                 .Join(
                 Context.Users,
                 friends => friends.SenderId == userId ? friends.ReceiverId : friends.SenderId, 
                 user => user.Id,
-                (friends, user) => new FriendshipDto
-                (
-                    friends.Id,
-                    user.Id,
+                (friends, user) => new
+                {
+                    FriendshipId = friends.Id,
+                    UserId = user.Id,
                     user.Username,
-                    user.AvatarUrl
-                )).ToListAsync(ct);
+                    user.AvatarKey
+                }).ToListAsync(ct);
+
+            return rows.Select(row => new FriendshipDto(
+                row.FriendshipId,
+                row.UserId,
+                row.Username,
+                avatarStorage.GetPublicUrl(row.AvatarKey))).ToList();
                    
         }
 
@@ -47,21 +53,29 @@ namespace DiscordLite.Infrastructure.Persistence.Repositories
 
         public async Task<List<FriendRequestDto>> GetIncomingAndOutgoingRequests(Guid userId, CancellationToken ct)
         {
-            return await Context.Friendships
+            var rows = await Context.Friendships
                 .Where(x => x.Status == FriendshipStatus.Pending && (x.SenderId == userId || x.ReceiverId == userId))
                 .Join(
                 Context.Users,
                 friends => friends.SenderId == userId ? friends.ReceiverId : friends.SenderId,
                 user => user.Id,
-                (friends, user) => new FriendRequestDto
-                (
-                    friends.Id,
-                    user.Id,
+                (friends, user) => new
+                {
+                    FriendshipId = friends.Id,
+                    UserId = user.Id,
                     user.Username,
-                    user.AvatarUrl,
+                    user.AvatarKey,
                     friends.CreatedAt,
-                    friends.ReceiverId == userId
-                )).ToListAsync(ct);
+                    IsIncoming = friends.ReceiverId == userId
+                }).ToListAsync(ct);
+
+            return rows.Select(row => new FriendRequestDto(
+                row.FriendshipId,
+                row.UserId,
+                row.Username,
+                avatarStorage.GetPublicUrl(row.AvatarKey),
+                row.CreatedAt,
+                row.IsIncoming)).ToList();
                    
         }
     }
