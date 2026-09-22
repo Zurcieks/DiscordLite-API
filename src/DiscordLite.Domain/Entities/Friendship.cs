@@ -28,7 +28,7 @@ namespace DiscordLite.Domain.Entities
             if (senderId == receiverId)
                 throw new DomainValidationException(
                     "FRIENDSHIP_SELF_REQUEST",
-                    "SenderId and ReceiverId cannot be the same.");
+                    "You cannot send a friend request to yourself.");
 
             return new Friendship
             {
