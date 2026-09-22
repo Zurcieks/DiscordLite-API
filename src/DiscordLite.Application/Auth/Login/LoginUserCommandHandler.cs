@@ -11,7 +11,8 @@ public sealed class LoginUserCommandHandler(
     IPasswordService passwordService,
     ITokenService tokenService,
     IRefreshTokenCookieWriter cookieWriter,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    IAvatarStorage avatarStorage)
     : IRequestHandler<LoginUserCommand, LoginUserResponse>
 {
     public async Task<LoginUserResponse> Handle(
@@ -51,7 +52,7 @@ public sealed class LoginUserCommandHandler(
         return new LoginUserResponse(
             user.Id,
             user.Username,
-            user.AvatarUrl,
+            avatarStorage.GetPublicUrl(user.AvatarKey),
             accessToken);
     }
 }

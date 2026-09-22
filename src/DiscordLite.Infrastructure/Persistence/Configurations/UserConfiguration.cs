@@ -20,7 +20,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.NormalizedUsername)
             .HasMaxLength(30)
             .IsRequired();
-        builder.Property(u => u.AvatarUrl)
+        builder.Property(u => u.AvatarKey)
             .HasMaxLength(2048);
         
         builder.HasIndex(u => u.NormalizedUsername)

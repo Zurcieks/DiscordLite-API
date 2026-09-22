@@ -11,7 +11,8 @@ public sealed class RegisterUserCommandHandler(
     IRefreshTokenCookieWriter cookieWriter,
     IPasswordService passwordService,
     ITokenService tokenService,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    IAvatarStorage avatarStorage)
     : IRequestHandler<RegisterUserCommand, RegisterUserResponse>
 {
     public async Task<RegisterUserResponse> Handle(
@@ -61,7 +62,6 @@ public sealed class RegisterUserCommandHandler(
         return new RegisterUserResponse(
             user.Id,
             user.Username,
-            user.AvatarUrl,
             accessToken);
     }
 }

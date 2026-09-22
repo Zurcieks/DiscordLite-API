@@ -6,7 +6,8 @@ namespace DiscordLite.Application.Users.GetMyProfile;
 
 public sealed class GetMyProfileQueryHandler(
     ICurrentUser currentUser,
-    IUserRepository userRepository)
+    IUserRepository userRepository,
+    IAvatarStorage avatarStorage)
     : IRequestHandler<GetMyProfileQuery, UserProfileResponse>
 {
     public async Task<UserProfileResponse> Handle(
@@ -23,6 +24,6 @@ public sealed class GetMyProfileQueryHandler(
         return new UserProfileResponse(
             user.Id,
             user.Username,
-            user.AvatarUrl);
+            avatarStorage.GetPublicUrl(user.AvatarKey));
     }
 }
