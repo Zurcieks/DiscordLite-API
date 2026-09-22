@@ -8,7 +8,7 @@ public sealed class User
     public string Username { get; private set; } = null!;
     public string NormalizedUsername { get; private set; } = null!;
     public string PasswordHash { get; private set; } = null!;
-    public string? AvatarUrl { get; private set; }
+    public string? AvatarKey { get; private set; }
 
     private User() { }
 
@@ -40,14 +40,14 @@ public sealed class User
         };
     }
 
-    public void ChangeAvatar(string? avatarUrl)
+    public void ChangeAvatar(string? avatarKey)
     {
-        if (avatarUrl is not null && string.IsNullOrWhiteSpace(avatarUrl))
+        if (avatarKey is not null && string.IsNullOrWhiteSpace(avatarKey))
             throw new DomainValidationException(
                 "USER_AVATAR_URL_INVALID",
                 "Avatar URL cannot be empty or whitespace.");
 
-        AvatarUrl = avatarUrl;
+        AvatarKey = avatarKey;
     }
 
     public static string NormalizeUsername(string username)
