@@ -52,7 +52,8 @@ public class ConversationRepository(AppDbContext context, IAvatarStorage avatarS
                 conversation.Id,
                 conversation.ConversationType,
                 otherUser.Username,
-                otherUser.AvatarKey
+                otherUser.AvatarKey,
+                OtherUserId = otherUser.Id
             };
         
         var rows = await conversations.ToListAsync(ct);
@@ -61,7 +62,9 @@ public class ConversationRepository(AppDbContext context, IAvatarStorage avatarS
             row.Id,
             row.ConversationType,
             row.Username,
-            avatarStorage.GetPublicUrl(row.AvatarKey))).ToList();
+            avatarStorage.GetPublicUrl(row.AvatarKey),
+            row.OtherUserId
+        )).ToList();
 
     }
 }
